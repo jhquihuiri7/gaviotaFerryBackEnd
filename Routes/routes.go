@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 type Pax struct {
 	Id string `bson:"_id,omitempty"`
@@ -78,6 +79,7 @@ func AddUser(w http.ResponseWriter, r *http.Request){
 			{"Status", status},
 			{"Nacionalidad", Utils.ProcessNA(nacionalidad)},
 			{"Edad", edad},
+			{"DateRegister", time.Now().Year()},
 		}
 		Utils.UsersCollection.InsertOne(context.TODO(),newFreqUser)
 	}

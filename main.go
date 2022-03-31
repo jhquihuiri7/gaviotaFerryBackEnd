@@ -4,12 +4,10 @@ import (
 	"DarwinScubaDiveBackend/ConectDB"
 	"DarwinScubaDiveBackend/Routes"
 	"DarwinScubaDiveBackend/Utils"
-	"net/http"
-	"os"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
+	"net/http"
 )
 
 var client *mongo.Client
@@ -35,8 +33,9 @@ func main() {
 	//credentials := handlers.AllowCredentials()
 	router.HandleFunc("/report/{Inicio}/{Final}/{Proveedor}", Routes.Report).Methods("POST")
 	router.HandleFunc("/reportUpdate/{Id}", Routes.UpdateFromReport).Methods("POST")
+	router.HandleFunc("/autocompleteUser", Routes.GetAutocompleteUser).Methods("GET")
 	methods := handlers.AllowedMethods([]string{"POST"})
 	origins := handlers.AllowedOrigins([]string{"*"})
-	port := os.Getenv("PORT")
-	http.ListenAndServe(":"+port, handlers.CORS(methods, origins)(router))
+	//port := os.Getenv("PORT")
+	http.ListenAndServe(":8080", handlers.CORS(methods, origins)(router))
 }
