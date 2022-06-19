@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
+	"os"
 )
 
 var client *mongo.Client
@@ -36,6 +37,6 @@ func main() {
 	router.HandleFunc("/autocompleteUser", Routes.GetAutocompleteUser).Methods("GET")
 	methods := handlers.AllowedMethods([]string{"POST"})
 	origins := handlers.AllowedOrigins([]string{"*"})
-	//port := os.Getenv("PORT")
-	http.ListenAndServe(":8080", handlers.CORS(methods, origins)(router))
+	port := os.Getenv("PORT")
+	http.ListenAndServe(":"+port, handlers.CORS(methods, origins)(router))
 }
