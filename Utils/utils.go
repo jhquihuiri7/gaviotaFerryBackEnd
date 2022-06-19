@@ -10,7 +10,8 @@ func ProcessNA(value string) string {
 	if value == "NA" || strings.ToUpper(value) == "BORRAR"{
 		return ""
 	}else {
-		return strings.ReplaceAll(strings.ToUpper(value),"@","")
+		r := strings.NewReplacer("@", "", "*", "")
+		return r.Replace(strings.ToUpper(value))
 	}
 }
 func GetColleciton(collection *mongo.Collection) *mongo.Collection{

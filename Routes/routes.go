@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
 	"strconv"
@@ -70,7 +72,7 @@ func AddUser(w http.ResponseWriter, r *http.Request){
 		{"Precio", precio},
 		{"Pagado", pagado},
 	}
-	if strings.Contains(referencia,"@"){
+	if strings.Contains(referencia,"@") {
 		newFreqUser := bson.D{
 			{"_id", uuid.NewV4().String()},
 			{"Referencia", Utils.ProcessNA(referencia)},
@@ -82,7 +84,31 @@ func AddUser(w http.ResponseWriter, r *http.Request){
 			{"DateRegister", time.Now().Year()},
 		}
 		Utils.UsersCollection.InsertOne(context.TODO(),newFreqUser)
+	}else if strings.Contains(referencia,"*") {
+		fmt.Println("AQUI")
+		newFreqUser := bson.D{
+			{"Referencia", Utils.ProcessNA(referencia)},
+			{"Cedula", Utils.ProcessNA(cedula)},
+			{"Telefono", Utils.ProcessNA(telefono)},
+			{"Status", status},
+			{"Nacionalidad", Utils.ProcessNA(nacionalidad)},
+			{"Edad", edad},
+			{"DateRegister", time.Now().Year()},
+		}
+		var replacedDocument bson.M
+		opts := options.FindOneAndReplace().SetUpsert(true)
+		filter := bson.D{{"Cedula", Utils.ProcessNA(cedula)}}
+		replacement := newFreqUser
+		err := Utils.UsersCollection.FindOneAndReplace(context.TODO(), filter, replacement, opts).Decode(&replacedDocument)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return
+			}
+			log.Fatal(err)
+		}
+		fmt.Printf("replaced document %v", replacedDocument)
 	}
+
 	Utils.ReservasCollection.InsertOne(context.TODO(),newUser)
 
 }
@@ -150,7 +176,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request){
 func UpdateUser (w http.ResponseWriter, r *http.Request){
 	params := mux.Vars(r)
 	id := params["Id"]
-	//fviaje := params["FViaje"]
+	fviaje := params["FViaje"]
 	//ruta := params["Ruta"]
 	referencia := params["Referencia"]
 	proveedor := params["Proveedor"]
@@ -174,6 +200,7 @@ func UpdateUser (w http.ResponseWriter, r *http.Request){
 		{"Edad", edad},
 		{"Precio", precio},
 		{"Pagado", pagado},
+		{"FViaje", fviaje},
 	}
 	Utils.ReservasCollection.UpdateOne(context.TODO(),bson.M{"_id": id},bson.D{{"$set", data}})
 }
