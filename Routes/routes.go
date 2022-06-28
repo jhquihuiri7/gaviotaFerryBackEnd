@@ -41,6 +41,25 @@ type PaxFreq struct {
 	Nacionalidad string `bson:"nacionalidad,omitempty"`
 	Edad int `bson:"edad,omitempty"`
 }
+
+func UpdateCapitanName(w http.ResponseWriter, r *http.Request){
+	params := mux.Vars(r)
+	replacement := bson.D{{"capitanName", params["capName"]}}
+	Utils.VariablesCollection.FindOneAndReplace(context.TODO(), bson.D{{"_id", "05b4c21b-21dd-405c-9c93-7e35346a6603"}}, replacement)
+}
+func GetCapitanName(w http.ResponseWriter, r *http.Request){
+	var capitanName Utils.CapitanName
+	opts := options.FindOne().SetProjection(bson.D{{"_id", 0}})
+	err := Utils.VariablesCollection.FindOne(context.TODO(), bson.D{{"_id", "05b4c21b-21dd-405c-9c93-7e35346a6603"}},opts).Decode(&capitanName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	data, err := json.Marshal(capitanName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprintln(w,string(data))
+}
 func AddUser(w http.ResponseWriter, r *http.Request){
 	params := mux.Vars(r)
 	fviaje := params["FViaje"]

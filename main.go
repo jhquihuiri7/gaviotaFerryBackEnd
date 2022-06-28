@@ -17,10 +17,18 @@ func init() {
 	client = ConectDB.ConectDB()
 	Utils.ReservasCollection = client.Database("GaviotaFerry").Collection("Reservas")
 	Utils.UsersCollection = client.Database("GaviotaFerry").Collection("Usuarios")
+	Utils.VariablesCollection = client.Database("GaviotaFerry").Collection("Variables")
+}
+
+type PRU struct {
+	ID string `bson:"_id"`
+	CapitanName string `bson:"capitanName"`
 }
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", Routes.Index)
+	router.HandleFunc("/updateCap/{capName}", Routes.UpdateCapitanName)
+	router.HandleFunc("/getCap", Routes.GetCapitanName)
 	router.HandleFunc(
 		"/addUser/{FViaje}/{Ruta}/{Referencia}/{Proveedor}/{Cedula}/{Telefono}/{Status}/"+
 			"{Nacionalidad}/{Observacion}/{FReserva}/{Edad}/{Precio}/{Pagado}",
